@@ -14,10 +14,14 @@ import (
 	"unsafe"
 )
 
+type Dispatch func(uint32, int32)
+
+
 type TimerEvent struct{
 	session int32
 	handle uint32
 	expire uint32
+	dispatch Dispatch
 }
 
 /*定时事件节点池*/
@@ -29,7 +33,7 @@ func GetEvent() *TimerEvent {
 
 func PutEvent(event *TimerEvent) {
 	event.session, event.handle = 0, 0
-	EventPool.Put(event)
+	EventPool.Put(*event)
 }
 
 type TimerEventQueue interface {

@@ -13,6 +13,6 @@ import (
 )
 
 
-func SrvPrintlen(str string, args ...interface{}){
-	log.Println(str, args)
+func SrvPrintf(str string, args ...interface{}){
+	log.Printf(str, args...)
 }

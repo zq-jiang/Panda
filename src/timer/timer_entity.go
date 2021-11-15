@@ -56,7 +56,9 @@ func ServiceTimerEntityNew() (t *timeEntity){
 }
 
 func (t *timeEntity)serviceTimerEntityDispatch(eventNode *TimerEvent){
-	logger.SrvPrintlen("test timer: %d,%d,%d", eventNode.session, eventNode.handle, eventNode.expire)
+	logger.SrvPrintf("event timer: %d,%d,%d", eventNode.session, eventNode.handle, eventNode.expire)
+
+	eventNode.dispatch(eventNode.handle, eventNode.session)
 }
 
 func (t *timeEntity)ServiceTimerEntityAdd(eventNode *TimerEvent){
@@ -129,7 +131,7 @@ func (t *timeEntity)ServiceTimerEntityWalk(){
 	var i uint64
 	cp := uint64(time.Now().UnixNano() / 1e6)
 	if cp < t.current {
-		//logger.SrvPrintlen("time diff error: change from %lld to %lld", cp, t.current)
+		//logger.SrvPrintf("time diff error: change from %lld to %lld", cp, t.current)
 		t.current = cp
 	} else if cp != t.current {
 		diff := cp - t.current
@@ -140,12 +142,12 @@ func (t *timeEntity)ServiceTimerEntityWalk(){
 	}
 }
 
-func (t *timeEntity)ServiceTimeout(handle uint32, timeout uint32, session int32) int32{
+func (t *timeEntity)ServiceTimeout(handle uint32, session int32, timeout uint32, dispatch Dispatch){
 	eventNode := GetEvent()
 	eventNode.handle = handle
 	eventNode.expire = timeout + t.ticks
 	eventNode.session = session
+	eventNode.dispatch = dispatch
 	t.ServiceTimerEntityAdd(eventNode)
-
-	return session
+	return
 }
